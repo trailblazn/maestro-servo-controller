@@ -14,7 +14,7 @@ class Maestro : public Nan::ObjectWrap {
   static void Init(v8::Local<v8::Object> exports);
 
  private:
-  explicit Maestro(unsigned char addr = 0x00, int baud_rate = 115200);
+  explicit Maestro();
   ~Maestro();
 
   static Nan::Persistent<v8::Function> constructor;
@@ -23,14 +23,12 @@ class Maestro : public Nan::ObjectWrap {
   static void Connect(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Disconnect(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  bool maestro_write(int device, unsigned char address, unsigned char command, unsigned char* data, int length);
+  bool maestro_write(int device, unsigned char command, unsigned char* data, int length);
   bool maestro_read(int device, unsigned char* buf, int length);
   int convertIntegerToBytes(int value, unsigned char* buf, int offset = 0);
 
   int               _maestro_device;
-  unsigned char     _maestro_address;
   const char*       _maestro_path;
-  int               _maestro_baud_rate;
 };
 
 #endif

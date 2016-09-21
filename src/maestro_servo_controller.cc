@@ -3,10 +3,7 @@
 Nan::Persistent<v8::Function> Maestro::constructor;
 
 // Constructor
-Maestro::Maestro(unsigned char addr, int baud_rate) {
-    _maestro_address = addr;
-    _maestro_baud_rate = baud_rate;
-}
+Maestro::Maestro() {}
 
 // Deconstructor
 Maestro::~Maestro() {
@@ -34,8 +31,6 @@ void Maestro::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   if (info.IsConstructCall()) {
     Maestro* maestro = new Maestro();
     maestro->Wrap(info.This());
-    // set maestro board address
-    maestro->_maestro_address = info[0]->IsUndefined() ? maestro->_maestro_address : (unsigned char)(info[0]->NumberValue());
 
     info.GetReturnValue().Set(info.This());
   } else {
@@ -52,11 +47,10 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
   v8::String::Utf8Value device_path(info[0]->ToString());
   maestro->_maestro_path = (const char*)(*device_path);
-  // drive control communication configuration
+  // control communication configuration
   printf("\nMaestro Virtual COM port: %s", maestro->_maestro_path);
-  printf("\nMaestro Bus address: %i", maestro->_maestro_address);
-  printf("\nConnecting to Maestro board...");
-  maestro->_maestro_device = open(maestro->_maestro_path, O_RDWR | O_NOCTTY | O_NDELAY);
+    printf("\nConnecting to Maestro board...");
+  maestro->_maestro_device = open(maestro->_maestro_path, O_RDWR | O_NOCTTY);
   if (maestro->_maestro_device == -1)
   {
     printf("\nFailed to connect!");
@@ -67,10 +61,9 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   printf("\nConnected!\n");
   struct termios options;
   tcgetattr(maestro->_maestro_device, &options);
-  options.c_cflag = maestro->_maestro_baud_rate | CS8 | CLOCAL | CREAD;   //<Set baud rate
-  options.c_iflag = IGNPAR;
-  options.c_oflag = 0;
-  options.c_lflag = 0;
+  options.c_iflag &= ~(INLCR | IGNCR | ICRNL | IXON | IXOFF);
+  options.c_oflag &= ~(ONLCR | OCRNL);
+  options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
   tcflush(maestro->_maestro_device, TCIFLUSH);
   tcsetattr(maestro->_maestro_device, TCSANOW, &options);
 
@@ -105,15 +98,13 @@ bool Maestro::maestro_read(int device, unsigned char* buf, int length) {
 }
 
 // Write to maestro board
-bool Maestro::maestro_write(int device, unsigned char address, unsigned char command, unsigned char* data, int length) {
-  unsigned char _data[2 + length + 2];  // addr(1) + cmd(1) + data(length) + checksum(2)
-  // device address
-  _data[0] = address;
+bool Maestro::maestro_write(int device, unsigned char command, unsigned char* data, int length) {
+  unsigned char _data[1 + length];  // cmd(1) + data(length)
   // device command
   _data[1] = command;
   // fill data bytes
   for(int i =0; i < length; i++) {
-    _data[i+2] = data[i];
+    _data[i+1] = data[i];
   }
   // write to device
   int w_result = write(device, &_data[0], sizeof(_data));

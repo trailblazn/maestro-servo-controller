@@ -8,13 +8,11 @@ var maestro = require("../../index").Maestro();
       Mac: '/dev/cu.usbmodem00115481'
       Ubuntu: '/dev/ttyAMA0'
       Raspi: '/dev/ttyACM0'
-
-  - baud rate:
-      defaults to 115200
 */
 
 // connect
-maestro.connect('/dev/cu.usbmodem00115481', 115200);
+// NOTE: The Maestro's serial mode must be set to "USB Dual Port".
+maestro.connect('/dev/cu.usbmodem00115481');
 
 // disconnect
 maestro.disconnect();
