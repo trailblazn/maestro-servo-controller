@@ -1,6 +1,6 @@
 #include "maestro_servo_controller.h"
 
-Nan::Persistent<v8::Function> RoboClaw::constructor;
+Nan::Persistent<v8::Function> Maestro::constructor;
 
 // Constructor
 Maestro::Maestro(unsigned char addr, int baud_rate) {
@@ -34,12 +34,12 @@ void Maestro::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   if (info.IsConstructCall()) {
     Maestro* maestro = new Maestro();
     maestro->Wrap(info.This());
-    // set roboclaw board address; or use default: 0x80
+    // set maestro board address
     maestro->_maestro_address = info[0]->IsUndefined() ? maestro->_maestro_address : (unsigned char)(info[0]->NumberValue());
 
     info.GetReturnValue().Set(info.This());
   } else {
-    // Invoked as plain function `RoboClaw(...)`, turn into construct call.
+    // Invoked as plain function `Maestro(...)`, turn into construct call.
     const int argc = 1;
     v8::Local<v8::Value> argv[argc] = { info[0] };
     v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
@@ -53,9 +53,9 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   v8::String::Utf8Value device_path(info[0]->ToString());
   maestro->_maestro_path = (const char*)(*device_path);
   // drive control communication configuration
-  printf("\nRoboClaw Virtual COM port: %s", maestro->_maestro_path);
-  printf("\nRoboClaw Bus address: %i", maestro->_maestro_address);
-  printf("\nConnecting to RoboClaw board...");
+  printf("\nMaestro Virtual COM port: %s", maestro->_maestro_path);
+  printf("\nMaestro Bus address: %i", maestro->_maestro_address);
+  printf("\nConnecting to Maestro board...");
   maestro->_maestro_device = open(maestro->_maestro_path, O_RDWR | O_NOCTTY | O_NDELAY);
   if (maestro->_maestro_device == -1)
   {
@@ -71,7 +71,7 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   options.c_iflag = IGNPAR;
   options.c_oflag = 0;
   options.c_lflag = 0;
-  tcflush(maestro->_roboclaw_device, TCIFLUSH);
+  tcflush(maestro->_maestro_device, TCIFLUSH);
   tcsetattr(maestro->_maestro_device, TCSANOW, &options);
 
   info.GetReturnValue().Set(true);
@@ -115,20 +115,9 @@ bool Maestro::maestro_write(int device, unsigned char address, unsigned char com
   for(int i =0; i < length; i++) {
     _data[i+2] = data[i];
   }
-  // generate packet checksum
-  unsigned int chksum = crc16(_data, (sizeof(_data)-2));
-  _data[sizeof(_data)-2] = chksum>>8;
-  _data[sizeof(_data)-1] = chksum;
   // write to device
   int w_result = write(device, &_data[0], sizeof(_data));
   if (w_result == -1 || w_result != (int)(sizeof(_data))) {
-    return false;
-  }
-  // read response
-  unsigned char response[1];
-  response[0] = 0;
-  int r_result = read(device, response, 1);
-  if (r_result == -1 || response[0] != 0xff) {
     return false;
   }
 

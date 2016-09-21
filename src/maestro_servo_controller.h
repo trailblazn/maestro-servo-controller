@@ -14,7 +14,7 @@ class Maestro : public Nan::ObjectWrap {
   static void Init(v8::Local<v8::Object> exports);
 
  private:
-  explicit Maestro(unsigned char addr = 0x80, int baud_rate = 115200);
+  explicit Maestro(unsigned char addr = 0x00, int baud_rate = 115200);
   ~Maestro();
 
   static Nan::Persistent<v8::Function> constructor;
