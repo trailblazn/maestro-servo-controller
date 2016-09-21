@@ -25,7 +25,6 @@ class Maestro : public Nan::ObjectWrap {
 
   bool maestro_write(int device, unsigned char command, unsigned char* data, int length);
   bool maestro_read(int device, unsigned char* buf, int length);
-  int convertIntegerToBytes(int value, unsigned char* buf, int offset = 0);
 
   int               _maestro_device;
   const char*       _maestro_path;

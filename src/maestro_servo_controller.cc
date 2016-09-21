@@ -77,19 +77,9 @@ void Maestro::Disconnect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   close(maestro->_maestro_device);
 }
 
-// convertIntegerToBytes
-int Maestro::convertIntegerToBytes(int value, unsigned char* buf, int offset) {
-  buf[offset]   = value>>24;
-  buf[offset+1] = value>>16;
-  buf[offset+2] = value>>8;
-  buf[offset+3] = value;
-
-  return offset + 4;
-}
-
 // Read from maestro board
 bool Maestro::maestro_read(int device, unsigned char* buf, int length) {
-  int r_result = read(device, buf, 1);
+  int r_result = read(device, buf, length);
   if (r_result == -1) {
     return false;
   }
@@ -101,7 +91,7 @@ bool Maestro::maestro_read(int device, unsigned char* buf, int length) {
 bool Maestro::maestro_write(int device, unsigned char command, unsigned char* data, int length) {
   unsigned char _data[1 + length];  // cmd(1) + data(length)
   // device command
-  _data[1] = command;
+  _data[0] = command;
   // fill data bytes
   for(int i =0; i < length; i++) {
     _data[i+1] = data[i];
