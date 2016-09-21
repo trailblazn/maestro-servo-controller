@@ -1,0 +1,16 @@
+{
+  "name": "maestro",
+  "version": "0.0.1",
+  "description": "Maestro Servo Controller",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "bindings": "~1.2.1",
+    "nan": "2.3.2",
+    "gamepad": "^1.2.2"
+  },
+  "scripts": {
+    "test": "node index.js"
+  },
+  "gypfile": true
+}
