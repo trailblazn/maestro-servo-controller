@@ -29,12 +29,13 @@ class Maestro : public Nan::ObjectWrap {
   static void Disconnect(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static void SetTarget(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void SetSpeed(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  int               _maestro_device;
-  const char*       _maestro_path;
-  int               _maestro_target_min;
-  int               _maestro_target_max;
-  int               _maestro_target_center;
+  const char* _maestro_path;
+  int _maestro_device;
+  int _maestro_target_min;
+  int _maestro_target_max;
+  int _maestro_target_center;
 };
 
 #endif
