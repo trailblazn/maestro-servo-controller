@@ -14,5 +14,7 @@ var maestro = require("../../index").Maestro();
 // NOTE: The Maestro's serial mode must be set to "USB Dual Port".
 maestro.connect('/dev/cu.usbmodem00115481');
 
+maestro.setTarget(0, 6000);
+
 // disconnect
 maestro.disconnect();

@@ -8,6 +8,11 @@
 #include <unistd.h>
 #include <termios.h>
 
+#define SET_TARGET_COMMAND    0x84
+#define GET_POSITION_COMMAND  0x90
+#define SET_SPEED_COMMAND     0x87
+#define SET_ACCEL_COMMAND     0x89
+
 // Maestro
 class Maestro : public Nan::ObjectWrap {
  public:
@@ -23,11 +28,13 @@ class Maestro : public Nan::ObjectWrap {
   static void Connect(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void Disconnect(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  bool maestro_write(int device, unsigned char command, unsigned char* data, int length);
-  bool maestro_read(int device, unsigned char* buf, int length);
+  static void SetTarget(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   int               _maestro_device;
   const char*       _maestro_path;
+  int               _maestro_target_min;
+  int               _maestro_target_max;
+  int               _maestro_target_center;
 };
 
 #endif
