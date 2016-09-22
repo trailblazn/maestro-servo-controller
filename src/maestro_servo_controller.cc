@@ -3,7 +3,12 @@
 Nan::Persistent<v8::Function> Maestro::constructor;
 
 // Constructor
-Maestro::Maestro() {}
+Maestro::Maestro() {
+  _maestro_target_min = 2000;  // quarter-microseconds
+  _maestro_target_max = 10000;
+
+  _maestro_target_center = 6000;  // 1500us
+}
 
 // Deconstructor
 Maestro::~Maestro() {
@@ -21,6 +26,8 @@ void Maestro::Init(v8::Local<v8::Object> exports) {
   // Prototype
   Nan::SetPrototypeMethod(tpl, "connect", Connect);
   Nan::SetPrototypeMethod(tpl, "disconnect", Disconnect);
+  Nan::SetPrototypeMethod(tpl, "setTarget", SetTarget);
+
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Maestro").ToLocalChecked(), tpl->GetFunction());
@@ -77,30 +84,22 @@ void Maestro::Disconnect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   close(maestro->_maestro_device);
 }
 
-// Read from maestro board
-bool Maestro::maestro_read(int device, unsigned char* buf, int length) {
-  int r_result = read(device, buf, length);
-  if (r_result == -1) {
-    return false;
+// SetTarget
+void Maestro::SetTarget(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
+  unsigned char channel = (unsigned char)(info[0]->NumberValue());
+  unsigned short target = (unsigned short)(info[1]->NumberValue());
+
+  unsigned char packet[] = {
+    SET_TARGET_COMMAND,                    // command
+    channel,                               // channel
+    (unsigned char)(target & 0x7F),        // target low byte
+    (unsigned char)(target >> 7 & 0x7F)    // target high byte
+  };
+
+  if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
+  	return info.GetReturnValue().Set(false);
   }
 
-  return true;
-}
-
-// Write to maestro board
-bool Maestro::maestro_write(int device, unsigned char command, unsigned char* data, int length) {
-  unsigned char _data[1 + length];  // cmd(1) + data(length)
-  // device command
-  _data[0] = command;
-  // fill data bytes
-  for(int i =0; i < length; i++) {
-    _data[i+1] = data[i];
-  }
-  // write to device
-  int w_result = write(device, &_data[0], sizeof(_data));
-  if (w_result == -1 || w_result != (int)(sizeof(_data))) {
-    return false;
-  }
-
-  return true;
+  return info.GetReturnValue().Set(true);
 }
