@@ -106,8 +106,8 @@ void Maestro::SetSpeed(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   unsigned char packet[] = {
     SET_SPEED_COMMAND,                    // command
     channel,                              // channel
-    (unsigned char)(speed & 0x7F),        // target low byte
-    (unsigned char)(speed >> 7 & 0x7F)    // target high byte
+    (unsigned char)(speed & 0x7F),        // speed low byte
+    (unsigned char)(speed >> 7 & 0x7F)    // speed high byte
   };
 
   if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
