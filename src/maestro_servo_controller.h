@@ -30,6 +30,7 @@ class Maestro : public Nan::ObjectWrap {
 
   static void SetTarget(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void SetSpeed(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void SetAccel(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   const char* _maestro_path;
   int _maestro_device;

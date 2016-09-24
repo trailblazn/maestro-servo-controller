@@ -17,11 +17,19 @@ servo.connect('/dev/cu.usbmodem00115481');
 
 
 /* ---------------------------------------------------
-  setTarget(channel, target)
+  setSpeed(channel, speed)
     - channel: servo number
     - speed: servo speed
 ------------------------------------------------------ */
 servo.setSpeed(0, 25);
+
+
+/* ---------------------------------------------------
+  setAccel(channel, accel)
+    - channel: servo number
+    - accel: servo acceleration
+------------------------------------------------------ */
+servo.setAccel(0, 2);
 
 
 /* ---------------------------------------------------

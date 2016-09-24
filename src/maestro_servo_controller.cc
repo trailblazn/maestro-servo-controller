@@ -28,6 +28,7 @@ void Maestro::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "disconnect", Disconnect);
   Nan::SetPrototypeMethod(tpl, "setTarget", SetTarget);
   Nan::SetPrototypeMethod(tpl, "setSpeed", SetSpeed);
+  Nan::SetPrototypeMethod(tpl, "setAccel", SetAccel);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Maestro").ToLocalChecked(), tpl->GetFunction());
@@ -112,6 +113,26 @@ void Maestro::SetSpeed(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
   if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
   	return info.GetReturnValue().Set(false);
+  }
+
+  return info.GetReturnValue().Set(true);
+}
+
+// SetAccel
+void Maestro::SetAccel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
+  unsigned char channel = (unsigned char)(info[0]->NumberValue());
+  unsigned short accel = (unsigned short)(info[1]->NumberValue());
+
+  unsigned char packet[] = {
+    SET_ACCEL_COMMAND,                    // command
+    channel,                              // channel
+    (unsigned char)(accel & 0x7F),        // accel low byte
+    (unsigned char)(accel >> 7 & 0x7F)    // accel high byte
+  };
+
+  if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
+    return info.GetReturnValue().Set(false);
   }
 
   return info.GetReturnValue().Set(true);
