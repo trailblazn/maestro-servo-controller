@@ -4,7 +4,11 @@
   "description": "Maestro Servo Controller",
   "keywords": [
     "maestro",
-    "servo controller"
+    "servo",
+    "controller",
+    "pololu",
+    "robot",
+    "node"
   ],
   "main": "index.js",
   "private": false,
