@@ -1,6 +1,6 @@
 {
   "name": "maestro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Maestro Servo Controller",
   "keywords": [
     "maestro",
@@ -8,9 +8,9 @@
   ],
   "main": "index.js",
   "private": false,
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/trailblazn/maestro.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trailblazn/maestro.git"
   },
   "dependencies": {
     "bindings": "~1.2.1",
