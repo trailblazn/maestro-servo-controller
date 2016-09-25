@@ -1,4 +1,4 @@
-var servo = require("../../index").Maestro();
+var servo = require("../../index");
 /* ---------------------------------------------------------------------------------
   The following script will connect to a Micro Maestro 6-Channel Servo Controller
 ------------------------------------------------------------------------------------ */
