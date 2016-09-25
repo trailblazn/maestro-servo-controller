@@ -17,7 +17,7 @@ Typical device names for:
 ### Mac
 - Mac: ```/dev/cu.usbmodem00115481```
 
-**NOTE:** _The trailing numbers in the device path name are likely to be different for your specific system. To discover the exact device path name for your system, simply run_ `ls /dev/` _before connecting the device to your host computer. Next, connect your device to the host machine. Now, run_** `ls /dev/` **_once again, and the newest device paths belong to your maestro device. Of the newly visible device path names, the one with the lower number is the device path name to use._
+**NOTE:** _The trailing numbers in the device path name are likely to be different for your specific system. To discover the exact device path name for your system, simply run_ `ls /dev/` _before connecting the device to your host computer. Next, connect your device to the host machine. Now, run_ `ls /dev/` _once again, and the newest device paths belong to your maestro device. Of the newly visible device path names, the one with the lower number is the device path name to use._
 
 ## Usage
 
