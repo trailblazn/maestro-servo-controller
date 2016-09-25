@@ -1,6 +1,6 @@
 {
   "name": "maestro",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Maestro Servo Controller",
   "main": "index.js",
   "private": true,
