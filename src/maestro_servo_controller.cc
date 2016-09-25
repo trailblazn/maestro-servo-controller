@@ -29,6 +29,7 @@ void Maestro::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "setTarget", SetTarget);
   Nan::SetPrototypeMethod(tpl, "setSpeed", SetSpeed);
   Nan::SetPrototypeMethod(tpl, "setAccel", SetAccel);
+  Nan::SetPrototypeMethod(tpl, "getPosition", GetPosition);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Maestro").ToLocalChecked(), tpl->GetFunction());
@@ -136,4 +137,27 @@ void Maestro::SetAccel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   }
 
   return info.GetReturnValue().Set(true);
+}
+
+// SetAccel
+void Maestro::GetPosition(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
+  unsigned char channel = (unsigned char)(info[0]->NumberValue());
+
+  unsigned char packet[] = {
+    GET_POSITION_COMMAND,      // command
+    channel                    // channel
+  };
+
+  if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
+    return info.GetReturnValue().Set(false);
+  }
+
+  unsigned char response[2];
+
+  if (read(maestro->_maestro_device, response, 2) != 2) {
+    return info.GetReturnValue().Set(false);
+  }
+
+  return info.GetReturnValue().Set(response[0] + 256*response[1]);
 }
