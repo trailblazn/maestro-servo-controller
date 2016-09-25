@@ -99,3 +99,8 @@ To disconnect to the maestro device attached to your computer's serial connectio
 //--------------------------------------------------------------------
 servo.disconnect();
 ```
+
+## References
+- You can purchase a Maestro device from [Pololu](https://www.pololu.com/product/1350/resources)
+- You can view supporting documentation in the [User Manual](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
+- You can test and configure your device, with the official [Maestro Servo Application](https://www.pololu.com/file/download/pololu-usb-sdk-140604.zip?file_id=0J765)
