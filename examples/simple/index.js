@@ -48,6 +48,13 @@ servo.setTarget(0, 6000);
 
 
 /* ---------------------------------------------------
+  getPosition(channel)
+    - channel: servo number
+------------------------------------------------------ */
+console.log('Servo position:', servo.getPosition(0));
+
+
+/* ---------------------------------------------------
   disconnect()
     - close connection to Maestro device
 ------------------------------------------------------ */
