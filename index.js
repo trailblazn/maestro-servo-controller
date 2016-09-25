@@ -1,1 +1,1 @@
-module.exports = require('bindings')('maestro.node');
+module.exports = require('bindings')('maestro.node').Maestro();
