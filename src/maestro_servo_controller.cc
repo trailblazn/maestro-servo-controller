@@ -27,7 +27,8 @@ void Maestro::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "connect", Connect);
   Nan::SetPrototypeMethod(tpl, "disconnect", Disconnect);
   Nan::SetPrototypeMethod(tpl, "setTarget", SetTarget);
-
+  Nan::SetPrototypeMethod(tpl, "setSpeed", SetSpeed);
+  Nan::SetPrototypeMethod(tpl, "setAccel", SetAccel);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Maestro").ToLocalChecked(), tpl->GetFunction());
@@ -54,18 +55,11 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
   v8::String::Utf8Value device_path(info[0]->ToString());
   maestro->_maestro_path = (const char*)(*device_path);
-  // control communication configuration
-  printf("\nMaestro Virtual COM port: %s", maestro->_maestro_path);
-    printf("\nConnecting to Maestro board...");
   maestro->_maestro_device = open(maestro->_maestro_path, O_RDWR | O_NOCTTY);
-  if (maestro->_maestro_device == -1)
-  {
-    printf("\nFailed to connect!");
-    perror(maestro->_maestro_path);
-    info.GetReturnValue().Set(false);
-    return;
+
+  if (maestro->_maestro_device == -1) {
+    return info.GetReturnValue().Set(false);
   }
-  printf("\nConnected!\n");
   struct termios options;
   tcgetattr(maestro->_maestro_device, &options);
   options.c_iflag &= ~(INLCR | IGNCR | ICRNL | IXON | IXOFF);
@@ -74,7 +68,7 @@ void Maestro::Connect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   tcflush(maestro->_maestro_device, TCIFLUSH);
   tcsetattr(maestro->_maestro_device, TCSANOW, &options);
 
-  info.GetReturnValue().Set(true);
+  return info.GetReturnValue().Set(true);
 }
 
 // Disconnect
@@ -99,6 +93,46 @@ void Maestro::SetTarget(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
   if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
   	return info.GetReturnValue().Set(false);
+  }
+
+  return info.GetReturnValue().Set(true);
+}
+
+// SetSpeed
+void Maestro::SetSpeed(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
+  unsigned char channel = (unsigned char)(info[0]->NumberValue());
+  unsigned short speed = (unsigned short)(info[1]->NumberValue());
+
+  unsigned char packet[] = {
+    SET_SPEED_COMMAND,                    // command
+    channel,                              // channel
+    (unsigned char)(speed & 0x7F),        // speed low byte
+    (unsigned char)(speed >> 7 & 0x7F)    // speed high byte
+  };
+
+  if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
+  	return info.GetReturnValue().Set(false);
+  }
+
+  return info.GetReturnValue().Set(true);
+}
+
+// SetAccel
+void Maestro::SetAccel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Maestro* maestro = ObjectWrap::Unwrap<Maestro>(info.Holder());
+  unsigned char channel = (unsigned char)(info[0]->NumberValue());
+  unsigned short accel = (unsigned short)(info[1]->NumberValue());
+
+  unsigned char packet[] = {
+    SET_ACCEL_COMMAND,                    // command
+    channel,                              // channel
+    (unsigned char)(accel & 0x7F),        // accel low byte
+    (unsigned char)(accel >> 7 & 0x7F)    // accel high byte
+  };
+
+  if (write(maestro->_maestro_device, packet, sizeof(packet)) == -1) {
+    return info.GetReturnValue().Set(false);
   }
 
   return info.GetReturnValue().Set(true);
